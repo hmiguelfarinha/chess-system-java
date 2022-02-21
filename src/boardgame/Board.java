@@ -4,9 +4,9 @@ public class Board {
 
 	private int rows;
 	private int columns;
-	private Piece[][] pieces;
+	private Piece[][] pieces; //matriz de meças 
 	
-	public Board(int rows, int columns) {
+	public Board(int rows, int columns) { 
 		this.rows = rows;
 		this.columns = columns;
 		pieces = new Piece[rows][columns];
@@ -28,4 +28,13 @@ public class Board {
 		this.columns = columns;
 	}
 	
+	public Piece piece (int row, int column) { //método para retornar a peça dada uma linha e uma coluna
+		return pieces[row][column];
+	}
+	
+	public Piece piece (Position position) { // sobrecarga do método para a posição
+		return pieces[position.getRow()][position.getColumn()];
+	}
+	
+	 
 }
