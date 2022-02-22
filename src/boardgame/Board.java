@@ -36,5 +36,8 @@ public class Board {
 		return pieces[position.getRow()][position.getColumn()];
 	}
 	
-	 
+	public void placePiece(Piece piece, Position position) { //na matriz de peças do tabuleiro na linha e coluna atribui a peça que veio como argumento, a matriz do tabuleiro
+		pieces[position.getRow()][position.getColumn()] = piece;
+		piece.position = position; //informação que a peça deixa de estar na posição nula mas sim na posição informada no método. a posição é acedida livremente porque está declarada na class piece como protected e é do mesmo pacote da Board
+	}
 }

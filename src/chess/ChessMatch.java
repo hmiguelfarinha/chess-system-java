@@ -1,6 +1,9 @@
 package chess;
 
 import boardgame.Board;
+import boardgame.Position;
+import chess.pieces.King;
+import chess.pieces.Rook;
 
 public class ChessMatch { //coração do sistema de xadrez
 
@@ -8,6 +11,7 @@ public class ChessMatch { //coração do sistema de xadrez
 	
 	public ChessMatch() { 
 		board = new Board (8, 8); //quem tem de saber a dimensão de um tabuleiro de xadrez é a classe chessmatch 
+		initialSetup(); //método que inicia a partida
 	}
 	
 	public ChessPiece[][] getPieces(){ //retorna uma matriz de peças de xadrez corrrespondentes à partida, não correspondente às peças, tem haver com a camada do programa onde se está 
@@ -18,5 +22,11 @@ public class ChessMatch { //coração do sistema de xadrez
 			}
 		}
 	return mat;	
+	}
+	
+	private void initialSetup() { //método responsavel por iniciar a partida colocando as peças no tabuleiro
+		board.placePiece(new Rook(board, Color.WHITE), new Position(2, 1));
+		board.placePiece(new King(board, Color.BLACK), new Position(0, 4));
+		board.placePiece(new King(board, Color.WHITE), new Position(7, 4));
 	}
 }
