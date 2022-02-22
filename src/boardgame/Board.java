@@ -7,6 +7,9 @@ public class Board {
 	private Piece[][] pieces; //matriz de meças 
 	
 	public Board(int rows, int columns) { 
+		if (rows < 1 || columns < 1) { // como não faz sentuido um tabuleiro menor que uma coluna e uma linha cria-se uma excecao defensivamente
+			throw new BoardException("Error creating board: there must be at least 1 row and 1 column");
+		}
 		this.rows = rows;
 		this.columns = columns;
 		pieces = new Piece[rows][columns];
@@ -16,28 +19,43 @@ public class Board {
 		return rows;
 	}
 
-	public void setRows(int rows) {
-		this.rows = rows;
-	}
-
 	public int getColumns() {
 		return columns;
 	}
 
-	public void setColumns(int columns) {
-		this.columns = columns;
-	}
-	
 	public Piece piece (int row, int column) { //método para retornar a peça dada uma linha e uma coluna
+		if (!positionExists(row, column)) { //para o caso da posição inserida não existir 
+			throw new BoardException("Position not on the board"); 
+		}
 		return pieces[row][column];
 	}
 	
 	public Piece piece (Position position) { // sobrecarga do método para a posição
+		if (!positionExists(position)) { //para o caso da posição inserida não existir 
+			throw new BoardException("Position not on the board"); 
+		}
 		return pieces[position.getRow()][position.getColumn()];
 	}
 	
 	public void placePiece(Piece piece, Position position) { //na matriz de peças do tabuleiro na linha e coluna atribui a peça que veio como argumento, a matriz do tabuleiro
+		if (thereIsAPiece(position)) { //verifica se já existe uma peça na posição indicada
+			throw new BoardException("There is already a piece on position " + position); 			
+		}
 		pieces[position.getRow()][position.getColumn()] = piece;
 		piece.position = position; //informação que a peça deixa de estar na posição nula mas sim na posição informada no método. a posição é acedida livremente porque está declarada na class piece como protected e é do mesmo pacote da Board
+	}
+	
+	private boolean positionExists(int row, int column) { // método auxiliar para saber se a posição existe. porque dentro da classe vai ser mais fácil testar pela linha e pela coluna do que pela posião
+		return row >= 0 && row < rows && column >= 0 && column < columns; //logica para saber se a posição existe através de linhas e colunas
+	}
+	public boolean positionExists (Position position) { // método para saber se a posição existe
+		return positionExists(position.getRow(), position.getColumn()); //auxiliado pelo método anterior 
+	}
+	
+	public boolean thereIsAPiece(Position position) {
+		if (!positionExists(position)) { //para o caso da posição inserida não existir 
+			throw new BoardException("Position not on the board"); 
+		}
+		return piece(position) != null;
 	}
 }
