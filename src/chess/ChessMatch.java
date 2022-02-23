@@ -1,6 +1,8 @@
 package chess;
 
 import boardgame.Board;
+import boardgame.Piece;
+import boardgame.Position;
 import chess.pieces.King;
 import chess.pieces.Rook;
 
@@ -23,9 +25,31 @@ public class ChessMatch { //coração do sistema de xadrez
 	return mat;	
 	}
 	
+	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
+		Position source = sourcePosition.toPosition(); //conversão da posição para posição da matriz
+		Position target = targetPosition.toPosition();//conversão da posição para posição da matriz
+		validateSourcePosition(source); //chamada do método para validar se realmente na posição de origem exisita uma peça 
+		Piece capturedPiece = makeMove(source, target); //o capturedPiece recebe o resultado da operação makeMove, operação responsavel por fazer o movimento da peça, já vem no formato matrix
+		return (ChessPiece)capturedPiece; //retorna a peça capturada, necessário fazer downcasting porque a peça capturada era do tipo piece
+	}
+	
+	private Piece makeMove(Position source, Position target) { //operação de movimento, recebe uma posição de origem e uma posição de destino
+		Piece p = board.removePiece(source); // p recebe a peça retirada da posição de origem
+		Piece capturedPiece = board.removePiece(target); //o capturedPiece recebe a possível peça que esteja no posição de destino, se ela existir
+		board.placePiece(p, target); // colocação da peça na posição de destino
+		return capturedPiece; //retorna a peça capturada
+	}
+	
+	private void validateSourcePosition(Position position) { //método para validar se na posição exisite uma peça 
+		if (!board.thereIsAPiece(position)) { 
+			throw new ChessException("There is no piece on source position"); //se não existir peça na posição manda uma exceção 
+		}	
+	}
+	
 	private void placeNewPiece(char column, int row, ChessPiece piece) { //método para informar o initialSteup das posição das peças no sistema do xadrez em vez do sistema da matrix
 		board.placePiece(piece, new ChessPosition(column, row).toPosition()); // .toPosition() é para converter para a posição de matrix
 	}
+	
 	private void initialSetup() { //método responsavel por iniciar a partida colocando as peças no tabuleiro
 		placeNewPiece('c', 1, new Rook(board, Color.WHITE));
         placeNewPiece('c', 2, new Rook(board, Color.WHITE));
