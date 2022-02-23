@@ -30,18 +30,24 @@ public class UI {
 	public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
 	public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 
-	public static ChessPosition readChessPosition(Scanner sc) { //para ler a posição do usuário aproveitamos o scanner do programa principal
+	// https://stackoverflow.com/questions/2979383/java-clear-the-console
+	public static void clearScreen() {
+		System.out.print("\033[H\033[2J");
+		System.out.flush();
+	}
+
+	public static ChessPosition readChessPosition(Scanner sc) { // para ler a posição do usuário aproveitamos o scanner
+																// do programa principal
 		try {
-			String s = sc.nextLine(); //lemos o valor indicado pelo utilizador, tipo c3
-			char column = s.charAt(0); //para sabermos a coluna
-			int row = Integer.parseInt(s.substring(1)); //para sabermos a linha
-			return new ChessPosition(column, row); //retorna coluna e linha 
-		}
-		catch (RuntimeException e){
+			String s = sc.nextLine(); // lemos o valor indicado pelo utilizador, tipo c3
+			char column = s.charAt(0); // para sabermos a coluna
+			int row = Integer.parseInt(s.substring(1)); // para sabermos a linha
+			return new ChessPosition(column, row); // retorna coluna e linha
+		} catch (RuntimeException e) {
 			throw new InputMismatchException("Error reading ChessPosition. Valid values are from a1 to h8.");
 		}
 	}
-	
+
 	public static void printBoard(ChessPiece[][] pieces) { // método para imprimir o tabuleiro, é estático! recebe o
 															// chesspiece chamando pieces
 		for (int i = 0; i < pieces.length; i++) {
@@ -58,15 +64,14 @@ public class UI {
 	private static void printPiece(ChessPiece piece) {
 		if (piece == null) {
 			System.out.print("-");
+		} else {
+			if (piece.getColor() == Color.WHITE) { // verificar se a peça a imprimir é preta ou branca, a preta está a
+													// ser imprimida a amarelo
+				System.out.print(ANSI_WHITE + piece + ANSI_RESET);
+			} else {
+				System.out.print(ANSI_YELLOW + piece + ANSI_RESET);
+			}
 		}
-        else {
-            if (piece.getColor() == Color.WHITE) { //verificar se a peça a imprimir é preta ou branca, a preta está a ser imprimida a amarelo 
-                System.out.print(ANSI_WHITE + piece + ANSI_RESET);
-            }
-            else {
-                System.out.print(ANSI_YELLOW + piece + ANSI_RESET);
-            }
-        }
-        System.out.print(" ");
+		System.out.print(" ");
 	}
 }
