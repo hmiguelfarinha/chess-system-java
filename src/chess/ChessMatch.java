@@ -44,6 +44,9 @@ public class ChessMatch { //coração do sistema de xadrez
 		if (!board.thereIsAPiece(position)) { 
 			throw new ChessException("There is no piece on source position"); //se não existir peça na posição manda uma exceção 
 		}	
+		if (!board.piece(position).isThereAnyPossibleMove()) { // verifica se existe movimento possivel para uma determinada peça 
+			throw new ChessException("There is no possible moves for the chosen piece");
+		}
 	}
 	
 	private void placeNewPiece(char column, int row, ChessPiece piece) { //método para informar o initialSteup das posição das peças no sistema do xadrez em vez do sistema da matrix
