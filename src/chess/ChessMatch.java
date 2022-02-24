@@ -29,6 +29,7 @@ public class ChessMatch { //coração do sistema de xadrez
 		Position source = sourcePosition.toPosition(); //conversão da posição para posição da matriz
 		Position target = targetPosition.toPosition();//conversão da posição para posição da matriz
 		validateSourcePosition(source); //chamada do método para validar se realmente na posição de origem exisita uma peça 
+		validateTargetPosition(source, target); //chamada do método para validar a posição de destino 
 		Piece capturedPiece = makeMove(source, target); //o capturedPiece recebe o resultado da operação makeMove, operação responsavel por fazer o movimento da peça, já vem no formato matrix
 		return (ChessPiece)capturedPiece; //retorna a peça capturada, necessário fazer downcasting porque a peça capturada era do tipo piece
 	}
@@ -46,6 +47,12 @@ public class ChessMatch { //coração do sistema de xadrez
 		}	
 		if (!board.piece(position).isThereAnyPossibleMove()) { // verifica se existe movimento possivel para uma determinada peça 
 			throw new ChessException("There is no possible moves for the chosen piece");
+		}
+	}
+	
+	private void validateTargetPosition(Position source, Position target) { //para validar se a posição de destino é valida em relação à posição de origem basta testar se a posição de destino é um movimento possível que estiver na posição de origem
+		if (!board.piece(source).possibleMove(target)) { //se para a peça de origem a posição de destino não é um movimento possível então não se pode mover para o destino
+			throw new ChessException("The chosen piece can't move to target position"); 
 		}
 	}
 	
