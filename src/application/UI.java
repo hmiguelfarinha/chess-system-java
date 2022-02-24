@@ -48,27 +48,40 @@ public class UI {
 		}
 	}
 
-	public static void printBoard(ChessPiece[][] pieces) { // método para imprimir o tabuleiro, é estático! recebe o
-															// chesspiece chamando pieces
+	public static void printBoard(ChessPiece[][] pieces) { // método para imprimir o tabuleiro, é estático! recebe o chesspiece chamando pieces
 		for (int i = 0; i < pieces.length; i++) {
 			System.out.print((8 - i) + " "); // imprime o 8 , 7 , 6 por aí fora da primeira coluna
-			for (int j = 0; j < pieces.length; j++) { // j<pieces.length considera-se que a matriz é quadrada então pode
-														// ser assim
-				printPiece(pieces[i][j]); // imprime a peça
+			for (int j = 0; j < pieces.length; j++) { // j<pieces.length considera-se que a matriz é quadrada então pode ser assim
+				printPiece(pieces[i][j], false); // imprime a peça
 			}
 			System.out.println(); // saltar de linha
 		}
 		System.out.println("  a b c d e f g h");
 	}
 
-	private static void printPiece(ChessPiece piece) {
+	public static void printBoard(ChessPiece[][] pieces, boolean[][] possibleMoves) { //sobrecarga do printBoard para imprimir as jogadas possíveis
+		for (int i = 0; i < pieces.length; i++) {
+			System.out.print((8 - i) + " "); // imprime o 8 , 7 , 6 por aí fora da primeira coluna
+			for (int j = 0; j < pieces.length; j++) { // j<pieces.length considera-se que a matriz é quadrada então pode ser assim
+				printPiece(pieces[i][j], possibleMoves[i][j]); // imprime a peça
+			}
+			System.out.println(); // saltar de linha
+		}
+		System.out.println("  a b c d e f g h");
+	}
+
+	private static void printPiece(ChessPiece piece, boolean background) {
+		if(background) {
+			System.out.print(ANSI_BLUE_BACKGROUND);
+		}
 		if (piece == null) {
-			System.out.print("-");
-		} else {
-			if (piece.getColor() == Color.WHITE) { // verificar se a peça a imprimir é preta ou branca, a preta está a
-													// ser imprimida a amarelo
+			System.out.print("-" + ANSI_RESET);
+		} 
+		else {
+			if (piece.getColor() == Color.WHITE) { // verificar se a peça a imprimir é preta ou branca, a preta está a ser imprimida a amarelo
 				System.out.print(ANSI_WHITE + piece + ANSI_RESET);
-			} else {
+			} 
+			else {
 				System.out.print(ANSI_YELLOW + piece + ANSI_RESET);
 			}
 		}

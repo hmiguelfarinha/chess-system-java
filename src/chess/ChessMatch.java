@@ -25,6 +25,12 @@ public class ChessMatch { //coração do sistema de xadrez
 	return mat;	
 	}
 	
+	public boolean[][] possibleMoves(ChessPosition sourcePosition){ //para na aplicação poder imprimir as posições possiveis a partir de uma posição de origem
+		Position position = sourcePosition.toPosition(); //conversão da posição de xadrez para uma posição de matriz normal
+		validateSourcePosition(position); //validação da posição de origem
+		return board.piece(position).possibleMoves();
+	}
+	
 	public ChessPiece performChessMove(ChessPosition sourcePosition, ChessPosition targetPosition) {
 		Position source = sourcePosition.toPosition(); //conversão da posição para posição da matriz
 		Position target = targetPosition.toPosition();//conversão da posição para posição da matriz
