@@ -63,7 +63,7 @@ public class UI {
 		for (int i = 0; i < pieces.length; i++) {
 			System.out.print((8 - i) + " "); // imprime o 8 , 7 , 6 por aí fora da primeira coluna
 			for (int j = 0; j < pieces.length; j++) { // j<pieces.length considera-se que a matriz é quadrada então pode ser assim
-				printPiece(pieces[i][j], possibleMoves[i][j]); // imprime a peça
+				printPiece(pieces[i][j], possibleMoves[i][j]); // imprime a peça com a cor se o movimento for possível 
 			}
 			System.out.println(); // saltar de linha
 		}
