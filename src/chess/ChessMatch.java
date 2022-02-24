@@ -8,11 +8,23 @@ import chess.pieces.Rook;
 
 public class ChessMatch { //coração do sistema de xadrez
 
+	private int turn;
+	private Color currentPlayer;
 	private Board board; //uma partida de xadrez tem de ter um tabuleiro
 	
 	public ChessMatch() { 
 		board = new Board (8, 8); //quem tem de saber a dimensão de um tabuleiro de xadrez é a classe chessmatch 
+		turn = 1;
+		currentPlayer = Color.WHITE;
 		initialSetup(); //método que inicia a partida
+	}
+	
+	public int getTurn() {
+		return turn;
+	}
+	
+	public Color getCurrentPlayer() {
+		return currentPlayer;
 	}
 	
 	public ChessPiece[][] getPieces(){ //retorna uma matriz de peças de xadrez corrrespondentes à partida, não correspondente às peças, tem haver com a camada do programa onde se está 
@@ -37,6 +49,7 @@ public class ChessMatch { //coração do sistema de xadrez
 		validateSourcePosition(source); //chamada do método para validar se realmente na posição de origem exisita uma peça 
 		validateTargetPosition(source, target); //chamada do método para validar a posição de destino 
 		Piece capturedPiece = makeMove(source, target); //o capturedPiece recebe o resultado da operação makeMove, operação responsavel por fazer o movimento da peça, já vem no formato matrix
+		nextTurn(); //troca o turno
 		return (ChessPiece)capturedPiece; //retorna a peça capturada, necessário fazer downcasting porque a peça capturada era do tipo piece
 	}
 	
@@ -51,6 +64,9 @@ public class ChessMatch { //coração do sistema de xadrez
 		if (!board.thereIsAPiece(position)) { 
 			throw new ChessException("There is no piece on source position"); //se não existir peça na posição manda uma exceção 
 		}	
+		if (currentPlayer != ((ChessPiece)board.piece(position)).getColor()) { //verificação se o jogador está a pegar nussa peça sua. foi necessário fazer downcasting porque o getColor é uma propriedade do CHessPiece e o Board.Piece é da classe mais genérica 
+			throw new ChessException("The chosen piece is not yours");
+		}
 		if (!board.piece(position).isThereAnyPossibleMove()) { // verifica se existe movimento possivel para uma determinada peça 
 			throw new ChessException("There is no possible moves for the chosen piece");
 		}
@@ -60,6 +76,11 @@ public class ChessMatch { //coração do sistema de xadrez
 		if (!board.piece(source).possibleMove(target)) { //se para a peça de origem a posição de destino não é um movimento possível então não se pode mover para o destino
 			throw new ChessException("The chosen piece can't move to target position"); 
 		}
+	}
+	
+	private void nextTurn() {
+		turn++; //incrementação do turno
+		currentPlayer = (currentPlayer == Color.WHITE) ? Color.BLACK : Color.WHITE; //função ternária para mudar de jogador
 	}
 	
 	private void placeNewPiece(char column, int row, ChessPiece piece) { //método para informar o initialSteup das posição das peças no sistema do xadrez em vez do sistema da matrix

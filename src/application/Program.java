@@ -18,7 +18,7 @@ public class Program {
 		while(true) { // para ficar sempre a repetir a partida dado que ainda não temos uma forma de terminar o jogo
 			try {
 				UI.clearScreen();
-				UI.printBoard(chessMatch.getPieces()); //função para imprimir as peças da partida (UI - User interface)
+				UI.printMatch(chessMatch); //função para imprimir as peças da partida (UI - User interface)
 				System.out.println();
 				System.out.print("Source: ");
 				ChessPosition source = UI.readChessPosition(sc);
