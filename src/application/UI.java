@@ -1,7 +1,10 @@
 package application;
 
+import java.util.Arrays;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import chess.ChessMatch;
 import chess.ChessPiece;
@@ -45,13 +48,15 @@ public class UI {
 			int row = Integer.parseInt(s.substring(1)); // para sabermos a linha
 			return new ChessPosition(column, row); // retorna coluna e linha
 		} catch (RuntimeException e) {
-			throw new InputMismatchException("Error reading ChessPosition. Valid values are from a1 to h8.");
+			throw new InputMismatchException("Error reading ChessPosition. Valid values are from a1 to h8."); //esta execepção é padrão do java que é um erro de entrada de dados
 		}
 	}
 
-		public static void printMatch(ChessMatch chessMatch) {
+		public static void printMatch(ChessMatch chessMatch, List<ChessPiece> captured) {
 			printBoard(chessMatch.getPieces());
 			System.out.println();
+			printCapturedPieces(captured);
+			System.out.println();			
 			System.out.println("Turn: " + chessMatch.getTurn());
 			System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
 		}
@@ -94,5 +99,19 @@ public class UI {
 			}
 		}
 		System.out.print(" ");
+	}
+	
+	private static  void printCapturedPieces(List<ChessPiece> captured) {//recebe uma lista das peças de xadrez e imprime na tela a lista das peças capturadas
+		List<ChessPiece> white = captured.stream().filter(x -> x.getColor() == Color.WHITE).collect(Collectors.toList()); //nova lista para as peças brancas -> LOGICA - lista das peças capturadas, feito o filtro com o predicado para a cor e adicionado à nova lista 
+		List<ChessPiece> black = captured.stream().filter(x -> x.getColor() == Color.BLACK)	.collect(Collectors.toList());
+		System.out.println("Captured pieces:");
+		System.out.print("White:");
+		System.out.print(ANSI_WHITE); //para garantir que se imprime em branco
+		System.out.print(Arrays.toString(white.toArray())); //forma padrão do java para imprimir um array de valores
+		System.out.println(ANSI_RESET); //reset da cor
+		System.out.print("Black:");
+		System.out.print(ANSI_YELLOW); //para garantir que se imprime em branco
+		System.out.println(Arrays.toString(black.toArray())); //forma padrão do java para imprimir um array de valores
+		System.out.println(ANSI_RESET); //reset da cor	
 	}
 }
