@@ -2,6 +2,9 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.swing.plaf.ColorUIResource;
 
 import boardgame.Board;
 import boardgame.Piece;
@@ -14,6 +17,7 @@ public class ChessMatch { //coração do sistema de xadrez
 	private int turn;
 	private Color currentPlayer;
 	private Board board; //uma partida de xadrez tem de ter um tabuleiro
+	private boolean check;
 	
 	private List<Piece> piecesOnTheBoard = new ArrayList<>();
 	private List<Piece> capturedPieces = new ArrayList<>();
@@ -21,7 +25,8 @@ public class ChessMatch { //coração do sistema de xadrez
 	public ChessMatch() { 
 		board = new Board (8, 8); //quem tem de saber a dimensão de um tabuleiro de xadrez é a classe chessmatch 
 		turn = 1;
-		currentPlayer = Color.WHITE;
+		currentPlayer = Color.WHITE; //é sempre o primeiro a começar
+		check = false; // uma propriedade boolean é sempre iniciada como false, foi colocado aqui por questão didática
 		initialSetup(); //método que inicia a partida
 	}
 	
@@ -31,6 +36,10 @@ public class ChessMatch { //coração do sistema de xadrez
 	
 	public Color getCurrentPlayer() {
 		return currentPlayer;
+	}
+	
+	public boolean getCheck() {
+		return check;
 	}
 	
 	public ChessPiece[][] getPieces(){ //retorna uma matriz de peças de xadrez corrrespondentes à partida, não correspondente às peças, tem haver com a camada do programa onde se está 
@@ -55,6 +64,13 @@ public class ChessMatch { //coração do sistema de xadrez
 		validateSourcePosition(source); //chamada do método para validar se realmente na posição de origem exisita uma peça 
 		validateTargetPosition(source, target); //chamada do método para validar a posição de destino 
 		Piece capturedPiece = makeMove(source, target); //o capturedPiece recebe o resultado da operação makeMove, operação responsavel por fazer o movimento da peça, já vem no formato matrix
+		
+		if (testCheck(currentPlayer)) { //teste se a jogada faz com que o jogador se autocoloque em check
+			undoMove(source, target, capturedPiece);
+			throw new ChessException("You  can't put yourself in check");
+		}
+		check = (testCheck(opponent(currentPlayer))) ? true : false; //expressão condicional ternária para saber se o oponente ficou em check, se ficar atualizada a variável de check para true
+		
 		nextTurn(); //troca o turno
 		return (ChessPiece)capturedPiece; //retorna a peça capturada, necessário fazer downcasting porque a peça capturada era do tipo piece
 	}
@@ -70,6 +86,18 @@ public class ChessMatch { //coração do sistema de xadrez
 		}
 		
 		return capturedPiece; //retorna a peça capturada
+	}
+	
+	private void undoMove(Position source, Position target, Piece capturedPiece) { //desfazer a jogada
+		Piece p = board.removePiece(target);
+		board.placePiece(p, source);
+		
+		if (capturedPiece != null) {
+			board.placePiece(capturedPiece, target);
+			capturedPieces.remove(capturedPiece);
+			piecesOnTheBoard.add(capturedPiece);
+		}
+
 	}
 	
 	private void validateSourcePosition(Position position) { //método para validar se na posição exisite uma peça 
@@ -93,6 +121,32 @@ public class ChessMatch { //coração do sistema de xadrez
 	private void nextTurn() {
 		turn++; //incrementação do turno
 		currentPlayer = (currentPlayer == Color.WHITE) ? Color.BLACK : Color.WHITE; //função ternária para mudar de jogador
+	}
+	
+	private Color opponent(Color color) { //método para retornar apenas a cor do oponente
+		return (color == Color.WHITE) ? Color.BLACK : Color.WHITE;
+	}
+	
+	private ChessPiece king(Color color) { //metodo para localizar o rei de uma determinada cor, varrendo as peças do jogo
+		List<Piece> list = piecesOnTheBoard.stream().filter(x -> ((ChessPiece)x).getColor() == color).collect(Collectors.toList()); //feito downcasting
+		for(Piece p : list) {
+			if(p instanceof King) { //se a peça p for uma instancia da classe rei, o instanceof é uma porpriedade de herança
+				return (ChessPiece)p; //necessário downcasting
+			}
+		}
+		throw new IllegalStateException("There is no " + color + "king on the board"); //não se vai tratar esta excecao no programa principal porque não é suposto ela nunca acontecer, se acontecer significa que o sistema de xadrez está mal construido, portanto deixa-se estoirar para depois resolver o problema
+	}
+	
+	private boolean testCheck(Color color) { //percorrer para cada uma das peças adversárias se existe um movimento possível que vá dar à casa do rei
+		Position kingPosition = king(color).getChessPosition().toPosition(); // o kingPosition fica com a posição do rei no formato matrix
+		List<Piece> opponentPieces = piecesOnTheBoard.stream().filter(x -> ((ChessPiece)x).getColor() == opponent(color)).collect(Collectors.toList()); //lista das peças do adversário 
+		for (Piece p : opponentPieces) {
+			boolean[][] mat = p.possibleMoves();
+			if(mat[kingPosition.getRow()][kingPosition.getColumn()]) { //se na posição do rei é verdadeiro retorna true
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private void placeNewPiece(char column, int row, ChessPiece piece) { //método para informar o initialSteup das posição das peças no sistema do xadrez em vez do sistema da matrix

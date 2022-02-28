@@ -59,6 +59,9 @@ public class UI {
 			System.out.println();			
 			System.out.println("Turn: " + chessMatch.getTurn());
 			System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
+			if(chessMatch.getCheck()) { //teste para saber se está alguem em check
+				System.out.println("CHECK!");
+			}
 		}
 	
 	public static void printBoard(ChessPiece[][] pieces) { // método para imprimir o tabuleiro, é estático! recebe o chesspiece chamando pieces

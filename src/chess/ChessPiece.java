@@ -17,6 +17,10 @@ public abstract class ChessPiece extends Piece {
 		return color;
 	}
 	
+	public ChessPosition getChessPosition() {
+		return ChessPosition.fromPosition(position); //conversão de posição normal para posição de xadrez
+	}
+	
 	protected boolean isThereOpponentPiece(Position position) { //método para saber se existe uma peça adversária numa determinada posição. É na classe genérica ChessPiece para ser reaproveitada em todas as outras peças
 		ChessPiece p = (ChessPiece)getBoard().piece(position); //p recebe a peça que estiver na posição. necessário fazer o downcasting
 		return p != null && p.getColor() != color; //verifica que se p é diferente de nula e se é a cor da peça é diferente da cor da peça em questão 

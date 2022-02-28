@@ -28,7 +28,7 @@ public class ChessPosition {
 	}
 	
 	protected static ChessPosition fromPosition(Position position) { //vai converter de posição normal para chesspostion 
-		return new ChessPosition((char)('a'- position.getColumn()), 8 - position.getRow()); //é preciso fazer o casting porque não converte automaticamente para char
+		return new ChessPosition((char)('a'+ position.getColumn()), 8 - position.getRow()); //é preciso fazer o casting porque não converte automaticamente para char
 	}
 	
 	@Override
