@@ -2,13 +2,17 @@ package chess.pieces;
 
 import boardgame.Board;
 import boardgame.Position;
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.Color;
 
 public class Pawn extends ChessPiece{
 
-	public Pawn(Board board, Color color) {
+	private ChessMatch chessMatch; //depedencia para a partida devido à jogada especial do en passant
+	
+	public Pawn(Board board, Color color, ChessMatch chessMatch) {
 		super(board, color);
+		this.chessMatch = chessMatch;
 
 	}
 
@@ -39,7 +43,18 @@ public class Pawn extends ChessPiece{
 			if(getBoard().positionExists(p) && isThereOpponentPiece(p)) { //se a posição existe e existe lá uma peça adversária
 				mat[p.getRow()][p.getColumn()] = true; //pode mover
 			}
-
+			
+			//Specialmove en passant white
+			if(position.getRow() == 3) { //para acontecer o en passant o peão tem de estar na linha 3 da matriz que é a linha 5 do xadrez
+				Position left = new Position(position.getRow(), position.getColumn() - 1); //posição ao lado esquerdo do peão 
+				if(getBoard().positionExists(left) && isThereOpponentPiece(left) && getBoard().piece(left) == chessMatch.getEnPassantVulnerable()) { //se a posição existe, se está la uma peça oponente e se a peça é a peça que está vulnerável n passant
+					mat[left.getRow() - 1][left.getColumn()] = true;
+				}
+				Position right = new Position(position.getRow(), position.getColumn() + 1); //posição ao lado esquerdo do peão 
+				if(getBoard().positionExists(right) && isThereOpponentPiece(right) && getBoard().piece(right) == chessMatch.getEnPassantVulnerable()) { //se a posição existe, se está la uma peça oponente e se a peça é a peça que está vulnerável n passant
+					mat[right.getRow() - 1][right.getColumn()] = true;
+				}
+			}
 		}
 		else { //para a peça preta
 			p.setValues(position.getRow() + 1, position.getColumn()); //para uma posição acima na matriz,
@@ -61,6 +76,18 @@ public class Pawn extends ChessPiece{
 			p.setValues(position.getRow() + 1, position.getColumn() + 1); //para a posição acima à esquerda, nordeste,
 			if(getBoard().positionExists(p) && isThereOpponentPiece(p)) { //se a posição existe e existe lá uma peça adversária
 				mat[p.getRow()][p.getColumn()] = true; //pode mover
+			}
+			
+			//Specialmove en passant black
+			if(position.getRow() == 4) { //para acontecer o en passant o peão tem de estar na linha 3 da matriz que é a linha 5 do xadrez
+				Position left = new Position(position.getRow(), position.getColumn() - 1); //posição ao lado esquerdo do peão 
+				if(getBoard().positionExists(left) && isThereOpponentPiece(left) && getBoard().piece(left) == chessMatch.getEnPassantVulnerable()) { //se a posição existe, se está la uma peça oponente e se a peça é a peça que está vulnerável n passant
+					mat[left.getRow() + 1][left.getColumn()] = true;
+				}
+				Position right = new Position(position.getRow(), position.getColumn() + 1); //posição ao lado esquerdo do peão 
+				if(getBoard().positionExists(right) && isThereOpponentPiece(right) && getBoard().piece(right) == chessMatch.getEnPassantVulnerable()) { //se a posição existe, se está la uma peça oponente e se a peça é a peça que está vulnerável n passant
+					mat[right.getRow() + 1][right.getColumn()] = true;
+				}
 			}
 		}
 		return mat;
