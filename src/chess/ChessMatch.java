@@ -90,7 +90,7 @@ public class ChessMatch { //coração do sistema de xadrez
 	
 	private Piece makeMove(Position source, Position target) { //operação de movimento, recebe uma posição de origem e uma posição de destino
 		ChessPiece p = (ChessPiece)board.removePiece(source); // p recebe a peça retirada da posição de origem
-		p.increseMoveCount();
+		p.increaseMoveCount();
 		Piece capturedPiece = board.removePiece(target); //o capturedPiece recebe a possível peça que esteja no posição de destino, se ela existir
 		board.placePiece(p, target); // colocação da peça na posição de destino
 		
@@ -99,12 +99,30 @@ public class ChessMatch { //coração do sistema de xadrez
 			capturedPieces.add(capturedPiece);
 		}
 		
+		//Specialmove castling kingside rook
+		if(p instanceof King && target.getColumn() == source.getColumn() + 2) { //se a peça p é uma instancia de Rei, e a posição de destino é a posição de origem + 2 para a coluna então é o roque menor
+			Position sourceT = new Position(source.getRow(), source.getColumn() + 3); //pegamos a posição da torre
+			Position targetT = new Position(source.getRow(), source.getColumn() + 1); //pegamos a posição de destino da torre
+			ChessPiece rook = (ChessPiece)board.removePiece(sourceT);
+			board.placePiece(rook, targetT);
+			rook.increaseMoveCount();
+		}
+		
+		//Specialmove castling queen rook
+		if(p instanceof King && target.getColumn() == source.getColumn() - 2) { //se a peça p é uma instancia de Rei, e a posição de destino é a posição de origem - 2 para a coluna então é o roque maior
+			Position sourceT = new Position(source.getRow(), source.getColumn() - 4); //pegamos a posição da torre
+			Position targetT = new Position(source.getRow(), source.getColumn() - 1); //pegamos a posição de destino da torre
+			ChessPiece rook = (ChessPiece)board.removePiece(sourceT);
+			board.placePiece(rook, targetT);
+			rook.increaseMoveCount();
+		}
+		
 		return capturedPiece; //retorna a peça capturada
 	}
 	
 	private void undoMove(Position source, Position target, Piece capturedPiece) { //desfazer a jogada
 		ChessPiece p = (ChessPiece)board.removePiece(target);
-		p.decreseMoveCount();
+		p.decreaseMoveCount();
 		board.placePiece(p, source);
 		
 		if (capturedPiece != null) {
@@ -113,6 +131,24 @@ public class ChessMatch { //coração do sistema de xadrez
 			piecesOnTheBoard.add(capturedPiece);
 		}
 
+		//Specialmove castling kingside rook
+		if(p instanceof King && target.getColumn() == source.getColumn() + 2) { //se a peça p é uma instancia de Rei, e a posição de destino é a posição de origem + 2 para a coluna então é o roque menor
+			Position sourceT = new Position(source.getRow(), source.getColumn() + 3); //pegamos a posição da torre
+			Position targetT = new Position(source.getRow(), source.getColumn() + 1); //pegamos a posição de destino da torre
+			ChessPiece rook = (ChessPiece)board.removePiece(targetT);
+			board.placePiece(rook, sourceT);
+			rook.decreaseMoveCount();
+		}
+		
+		//Specialmove castling queen rook
+		if(p instanceof King && target.getColumn() == source.getColumn() - 2) { //se a peça p é uma instancia de Rei, e a posição de destino é a posição de origem - 2 para a coluna então é o roque maior
+			Position sourceT = new Position(source.getRow(), source.getColumn() - 4); //pegamos a posição da torre
+			Position targetT = new Position(source.getRow(), source.getColumn() - 1); //pegamos a posição de destino da torre
+			ChessPiece rook = (ChessPiece)board.removePiece(targetT);
+			board.placePiece(rook, sourceT);
+			rook.decreaseMoveCount();
+		}
+	
 	}
 	
 	private void validateSourcePosition(Position position) { //método para validar se na posição exisite uma peça 
@@ -200,7 +236,7 @@ public class ChessMatch { //coração do sistema de xadrez
         placeNewPiece('b', 1, new Knight(board, Color.WHITE));
         placeNewPiece('c', 1, new Bishop(board, Color.WHITE));
         placeNewPiece('d', 1, new Queen(board, Color.WHITE));
-        placeNewPiece('e', 1, new King(board, Color.WHITE));
+        placeNewPiece('e', 1, new King(board, Color.WHITE, this)); //O diz é autoreferencia para a partida em questão, tem de ser passada quando se instancia o Rei porque o rei tem acesso à partida
         placeNewPiece('f', 1, new Bishop(board, Color.WHITE));
         placeNewPiece('g', 1, new Knight(board, Color.WHITE));
         placeNewPiece('h', 1, new Rook(board, Color.WHITE));
@@ -217,7 +253,7 @@ public class ChessMatch { //coração do sistema de xadrez
         placeNewPiece('b', 8, new Knight(board, Color.BLACK));
         placeNewPiece('c', 8, new Bishop(board, Color.BLACK));
         placeNewPiece('d', 8, new Queen(board, Color.BLACK));
-        placeNewPiece('e', 8, new King(board, Color.BLACK));
+        placeNewPiece('e', 8, new King(board, Color.BLACK, this));
         placeNewPiece('f', 8, new Bishop(board, Color.BLACK)); 
         placeNewPiece('g', 8, new Knight(board, Color.BLACK));
         placeNewPiece('h', 8, new Rook(board, Color.BLACK));

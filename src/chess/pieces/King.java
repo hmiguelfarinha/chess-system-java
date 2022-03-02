@@ -2,13 +2,17 @@ package chess.pieces;
 
 import boardgame.Board;
 import boardgame.Position;
+import chess.ChessMatch;
 import chess.ChessPiece;
 import chess.Color;
 
 public class King extends ChessPiece {
 
-	public King(Board board, Color color) {
+	private ChessMatch chessMatch; //para o rei ter acesso à partida 
+	
+	public King(Board board, Color color, ChessMatch chessMatch) {
 		super(board, color);
+		this.chessMatch = chessMatch;
 	}
 
 	public String toString() {
@@ -20,6 +24,10 @@ public class King extends ChessPiece {
 		return p == null || p.getColor() != getColor(); //se p diferente de nulo e a cor de p diferente da por em questão
 	}
 	
+	private boolean testRookCastling(Position position) { //teste de a torre está apta para roque
+		ChessPiece p = (ChessPiece)getBoard().piece(position); //adquirida a peça da posição p
+		return p != null && p instanceof Rook && p.getColor() == getColor() && p.getMoveCount() == 0; //se a peça p for diferente de nulo, se é uma torre, se a cor é igual à cor do rei e se ainda não fez movimentos
+	}
 	
 	@Override
 	public boolean[][] possibleMoves() {
@@ -75,6 +83,30 @@ public class King extends ChessPiece {
 			mat[p.getRow()][p.getColumn()] = true;
 		}
 		
+		//Specialmove castling
+		if(getMoveCount() == 0 && !chessMatch.getCheck()) { //se é a primeira jogada e não está em check
+			//specialmove castling ring side rook
+			Position posT1 = new Position(position.getRow(), position.getColumn() + 3); //posição onde deve estar a torre em relação ao rei, tanto para peças pretas como brancas
+			if(testRookCastling(posT1)) { //se der verdadeiro ainda falta testar se as duas casas entre eles estão vazias
+				Position p1 = new Position(position.getRow(), position.getColumn() + 1); //casa à direita do rei 
+				Position p2 = new Position(position.getRow(), position.getColumn() + 2); //duas casas à direita do rei
+				if(getBoard().piece(p1) == null && getBoard().piece(p2) == null) {
+					mat[position.getRow()][position.getColumn() + 2] = true;
+				}
+			}
+			
+			//specialmove castling ring side rook
+			Position posT2 = new Position(position.getRow(), position.getColumn() - 4); //posição onde deve estar a torre em relação ao rei, tanto para peças pretas como brancas
+			if(testRookCastling(posT2)) { //se der verdadeiro ainda falta testar se as duas casas entre eles estão vazias
+				Position p1 = new Position(position.getRow(), position.getColumn() - 1); //casa à esquerda do rei 
+				Position p2 = new Position(position.getRow(), position.getColumn() - 2); //duas casas à esquerda do rei
+				Position p3 = new Position(position.getRow(), position.getColumn() - 3); //três casas à esquerda do rei
+
+				if(getBoard().piece(p1) == null && getBoard().piece(p2) == null && getBoard().piece(p3) == null) {
+					mat[position.getRow()][position.getColumn() - 2] = true;
+				}
+			}
+		}
 		return mat;
 	}
 }
