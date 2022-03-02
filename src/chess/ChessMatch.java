@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.swing.plaf.ColorUIResource;
-
 import boardgame.Board;
 import boardgame.Piece;
 import boardgame.Position;
@@ -18,6 +16,7 @@ public class ChessMatch { //coração do sistema de xadrez
 	private Color currentPlayer;
 	private Board board; //uma partida de xadrez tem de ter um tabuleiro
 	private boolean check;
+	private boolean checkMate;
 	
 	private List<Piece> piecesOnTheBoard = new ArrayList<>();
 	private List<Piece> capturedPieces = new ArrayList<>();
@@ -40,6 +39,10 @@ public class ChessMatch { //coração do sistema de xadrez
 	
 	public boolean getCheck() {
 		return check;
+	}
+	
+	public boolean getCheckMate() {
+		return checkMate;
 	}
 	
 	public ChessPiece[][] getPieces(){ //retorna uma matriz de peças de xadrez corrrespondentes à partida, não correspondente às peças, tem haver com a camada do programa onde se está 
@@ -71,7 +74,13 @@ public class ChessMatch { //coração do sistema de xadrez
 		}
 		check = (testCheck(opponent(currentPlayer))) ? true : false; //expressão condicional ternária para saber se o oponente ficou em check, se ficar atualizada a variável de check para true
 		
-		nextTurn(); //troca o turno
+		if(testCheckMate(opponent(currentPlayer))) { //testar se o jogo acabou para o oponente da peça que se mexeu 
+			checkMate = true;
+		}
+		else {
+			nextTurn(); //troca o turno
+		}
+		
 		return (ChessPiece)capturedPiece; //retorna a peça capturada, necessário fazer downcasting porque a peça capturada era do tipo piece
 	}
 	
@@ -149,24 +158,43 @@ public class ChessMatch { //coração do sistema de xadrez
 		return false;
 	}
 	
+	private boolean testCheckMate(Color color) {
+		if(!testCheck(color)) {
+			return false;
+		}
+		List<Piece> list = piecesOnTheBoard.stream().filter(x -> ((ChessPiece)x).getColor() == color).collect(Collectors.toList()); //list para todas as peças da cor
+		for(Piece p : list) {//for para percorrer todas as peças da lista
+			boolean [][] mat = p.possibleMoves(); //matriz que vai ser percorrida todas as peças para ver se alguma retira o check, se existir retorna falso para o check mate
+			for (int i=0; i<board.getRows(); i++) {
+				for (int j=0; j<board.getColumns(); j++) {
+					if(mat[i][j]) { //para cada elemento da matriz e exista um movimento possivel verfica-se se tira do check
+						Position source = ((ChessPiece)p).getChessPosition().toPosition(); //para a verificação movemos a peça p da sua posição para o movimento possível, aqui foi necessário fazer o downcasting porque o Position não é da classe ChessPiece e é necessáiro para fazer o toPosition
+						Position target = new Position(i, j); //target é a posição que estamos a testar
+						Piece capturedPiece = makeMove(source, target); //fazemos o movimento
+						boolean testCheck = testCheck(color); //testemos o check
+						undoMove(source, target, capturedPiece); //desfazemos logo o movimento para voltar à forma incial
+						if(!testCheck) { // verificamos como tinha ficado a variavel auxiliar para o testcheck e se há checkmate segundo a jogada possivel
+							return false;
+						}
+						
+					}
+				}
+			}
+		}
+		return true; //se esgotar o for e não houver nenhuma movimento possivel que retire do check então está em checkamte
+	}
+	
 	private void placeNewPiece(char column, int row, ChessPiece piece) { //método para informar o initialSteup das posição das peças no sistema do xadrez em vez do sistema da matrix
 		board.placePiece(piece, new ChessPosition(column, row).toPosition()); // .toPosition() é para converter para a posição de matrix
 		piecesOnTheBoard.add(piece); //peça colocada no lista de peças no tabuleiro 
 	}
 	
 	private void initialSetup() { //método responsavel por iniciar a partida colocando as peças no tabuleiro
-		placeNewPiece('c', 1, new Rook(board, Color.WHITE));
-        placeNewPiece('c', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('d', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('e', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('e', 1, new Rook(board, Color.WHITE));
-        placeNewPiece('d', 1, new King(board, Color.WHITE));
+		placeNewPiece('h', 7, new Rook(board, Color.WHITE));
+        placeNewPiece('d', 1, new Rook(board, Color.WHITE));
+        placeNewPiece('e', 1, new King(board, Color.WHITE));
 
-        placeNewPiece('c', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('c', 8, new Rook(board, Color.BLACK));
-        placeNewPiece('d', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('e', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('e', 8, new Rook(board, Color.BLACK));
-        placeNewPiece('d', 8, new King(board, Color.BLACK));
+        placeNewPiece('b', 8, new Rook(board, Color.BLACK));
+        placeNewPiece('a', 8, new King(board, Color.BLACK));
 	}
 }

@@ -18,7 +18,7 @@ public class Program {
 		ChessMatch chessMatch = new ChessMatch(); //criada partida de xadrez
 		List<ChessPiece> captured = new ArrayList<>();
 		
-		while(true) { // para ficar sempre a repetir a partida dado que ainda não temos uma forma de terminar o jogo
+		while(!chessMatch.getCheckMate()) { // retiramos o loop constante e passamos que é enquanto a partida não estiver em checkamte
 			try {
 				UI.clearScreen();
 				UI.printMatch(chessMatch, captured); //função para imprimir as peças da partida (UI - User interface) e o lista de peças capturadas
@@ -47,9 +47,10 @@ public class Program {
 				System.out.println(e.getMessage());
 				sc.nextLine();
 			}
+			
 		}
-		
-		
+		UI.clearScreen();
+		UI.printMatch(chessMatch, captured); //terminado o checkamte imprimesse para ter a visão da partida finalizada
 	}
-
+	
 }

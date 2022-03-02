@@ -52,17 +52,23 @@ public class UI {
 		}
 	}
 
-		public static void printMatch(ChessMatch chessMatch, List<ChessPiece> captured) {
-			printBoard(chessMatch.getPieces());
-			System.out.println();
-			printCapturedPieces(captured);
-			System.out.println();			
-			System.out.println("Turn: " + chessMatch.getTurn());
+	public static void printMatch(ChessMatch chessMatch, List<ChessPiece> captured) {
+		printBoard(chessMatch.getPieces());
+		System.out.println();
+		printCapturedPieces(captured);
+		System.out.println();			
+		System.out.println("Turn: " + chessMatch.getTurn());
+		if(!chessMatch.getCheckMate()) {
 			System.out.println("Waiting player: " + chessMatch.getCurrentPlayer());
 			if(chessMatch.getCheck()) { //teste para saber se está alguem em check
-				System.out.println("CHECK!");
+				System.out.println("CHECK!");	
 			}
 		}
+		else {
+			System.out.println("CHECKMATE!");
+			System.out.println("Winner: " + chessMatch.getCurrentPlayer());
+		}
+	}
 	
 	public static void printBoard(ChessPiece[][] pieces) { // método para imprimir o tabuleiro, é estático! recebe o chesspiece chamando pieces
 		for (int i = 0; i < pieces.length; i++) {
