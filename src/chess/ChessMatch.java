@@ -85,7 +85,8 @@ public class ChessMatch { //coração do sistema de xadrez
 	}
 	
 	private Piece makeMove(Position source, Position target) { //operação de movimento, recebe uma posição de origem e uma posição de destino
-		Piece p = board.removePiece(source); // p recebe a peça retirada da posição de origem
+		ChessPiece p = (ChessPiece)board.removePiece(source); // p recebe a peça retirada da posição de origem
+		p.increseMoveCount();
 		Piece capturedPiece = board.removePiece(target); //o capturedPiece recebe a possível peça que esteja no posição de destino, se ela existir
 		board.placePiece(p, target); // colocação da peça na posição de destino
 		
@@ -98,7 +99,8 @@ public class ChessMatch { //coração do sistema de xadrez
 	}
 	
 	private void undoMove(Position source, Position target, Piece capturedPiece) { //desfazer a jogada
-		Piece p = board.removePiece(target);
+		ChessPiece p = (ChessPiece)board.removePiece(target);
+		p.decreseMoveCount();
 		board.placePiece(p, source);
 		
 		if (capturedPiece != null) {
