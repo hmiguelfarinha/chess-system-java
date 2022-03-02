@@ -1,5 +1,6 @@
 package chess;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ public class ChessMatch { //coração do sistema de xadrez
 	private boolean check;
 	private boolean checkMate;
 	private ChessPiece enPassantVulnerable; //por padrão começa como nula então não é necessario inciar no contrutor
+	private ChessPiece promoted; //promoção do peão a rainha, bispo, cavalo ou torre
 	
 	private List<Piece> piecesOnTheBoard = new ArrayList<>();
 	private List<Piece> capturedPieces = new ArrayList<>();
@@ -54,6 +56,10 @@ public class ChessMatch { //coração do sistema de xadrez
 		return enPassantVulnerable;
 	}
 	
+	public ChessPiece getPormoted() {
+		return promoted;
+	}
+	
 	public ChessPiece[][] getPieces(){ //retorna uma matriz de peças de xadrez corrrespondentes à partida, não correspondente às peças, tem haver com a camada do programa onde se está 
 		ChessPiece[][] mat = new ChessPiece[board.getRows()][board.getColumns()]; //
 		for (int i = 0; i<board.getRows(); i++) {			//percorrer a matriz de peças do tabuleiro e fazer um downcasting para chesspiece
@@ -84,6 +90,15 @@ public class ChessMatch { //coração do sistema de xadrez
 		
 		ChessPiece movedPiece = (ChessPiece)board.piece(target); //pegamos a peça que foi movida
 		
+		//specialmove promotion 
+		promoted = null;
+		if(movedPiece instanceof Pawn) {
+			if(movedPiece.getColor() == Color.WHITE && target.getRow() == 0 || movedPiece.getColor() == Color.BLACK && target.getRow() == 7){
+				promoted = (ChessPiece)board.piece(target); //dizemos que quem foi promovido foi o peão que chegou ao final 
+				promoted = replacePromotedPiece("Q"); //vamos trocar por padrão pela rainha e depois de trocar é que pedimos ao user para digitar uma letra para escolher qual quer
+			}
+		}
+		
 		
 		check = (testCheck(opponent(currentPlayer))) ? true : false; //expressão condicional ternária para saber se o oponente ficou em check, se ficar atualizada a variável de check para true
 		
@@ -102,6 +117,32 @@ public class ChessMatch { //coração do sistema de xadrez
 			enPassantVulnerable = null;	
 		}
 		return (ChessPiece)capturedPiece; //retorna a peça capturada, necessário fazer downcasting porque a peça capturada era do tipo piece
+	}
+	
+	public ChessPiece replacePromotedPiece(String type) {
+		if(promoted == null) {
+			throw new IllegalStateException("There is no piece to be promoted");
+		}
+		if (!type.equals("B") && !type.equals("N") && !type.equals("Q") && !type.equals("R")) {
+			throw new InvalidParameterException("Invalid type for promotion");
+		}
+		
+		Position pos = promoted.getChessPosition().toPosition();
+		Piece p = board.removePiece(pos); //removida a peça que estava na posição e guardada na variável p
+		piecesOnTheBoard.remove(p); //remoção da peça da lista das peças no tabuleiro
+		
+		ChessPiece newPiece = newPiece(type, promoted.getColor()); //instanciacao da nova peça
+		board.placePiece(newPiece, pos);//colocação da nova peça na posição da peça promovida
+		piecesOnTheBoard.add(newPiece);
+		
+		return newPiece;
+	}
+	
+	private ChessPiece newPiece (String type, Color color) { //método auxiliar para instanciar a peça especifica no replacePromotedPiece
+		if(type.equals("B")) return new Bishop(board, color);
+		if(type.equals("N")) return new Knight(board, color);		
+		if(type.equals("Q")) return new Queen(board, color);
+		return new Rook(board, color);
 	}
 	
 	private Piece makeMove(Position source, Position target) { //operação de movimento, recebe uma posição de origem e uma posição de destino

@@ -33,10 +33,17 @@ public class Program {
 				System.out.println();
 				System.out.print("Target: ");
 				ChessPosition target = UI.readChessPosition(sc);
+				
 				ChessPiece capturedPiece = chessMatch.performChessMove(source, target);		
 				
 				if (capturedPiece != null) {
 					captured.add(capturedPiece);
+				}
+				
+				if(chessMatch.getPormoted() != null) { //se o getPromoted é diferente de nula significa que um peça foi promovida
+					System.out.print("Enter piece for promotion (B/N/R/Q): ");
+					String type = sc.nextLine();
+					chessMatch.replacePromotedPiece(type);
 				}
 			}
 			catch (ChessException e) {
